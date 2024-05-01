@@ -15,7 +15,7 @@ class Login_model extends CI_Model {
         $this->db->where('password',$data['password']);
         $this->db->where('deleted_at',null);
         $user = $this->db->get('shibir_users')->row_array();
-
+        
         return $user;
     }
 

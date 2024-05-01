@@ -25,35 +25,59 @@ class Login extends CI_Controller {
         parent::__construct();
         $this->load->model('admin_panel_model');
         $this->load->model('login_model');
+        $this->session = $this->session;
     }
 
     public function login(){
-        $postData = file_get_contents("php://input");
-        $data = json_decode($postData, true);   
-        $user_details = $this->login_model->check_user($data);
-        $status;
-        if(isset($user_details) && !empty($user_details)){
-            $this->session->set_userdata('user_id', $data['shibir_id']);
-            return true;
-        }
-        else{
-            return false;
-        }
+    $postData = file_get_contents("php://input");
+    $data = json_decode($postData, true);   
+    $user_details = $this->login_model->check_user($data);
+    $response = array();
+
+    if(isset($user_details) && !empty($user_details)){
+        $this->session->set_userdata('user_id', $data['shibir_id']);
+        $response['status'] = true;
+        $response['message'] = 'Login successful';
     }
+    else{
+        $response['status'] = false;
+        $response['message'] = 'Login failed';
+    }
+
+    header('Content-Type: application/json');
+    echo json_encode($response);
+}
+
         
 
     public function reset(){
-        $postData = file_get_contents("php://input");
-        $data = json_decode($postData, true);
-        if(isset($data) && !empty($data)){
-            $data['is_password_changed'] = 'yes';
-            $user = $this->login_model->reset_password($post_data);
-            if(isset($user) && !empty($user)){
-                    return true;
-            }
-            else{
-                    return false;
-            }
+    $postData = file_get_contents("php://input");
+    $data = json_decode($postData, true);
+    $x = $this->session->userdata('user_id') ?? '';
+    if($x != ''){
+        $data['shibir_id'] = $this->session->userdata('user_id');
+    }
+    $response = array();
+
+    if(isset($data) && !empty($data)){
+        $data['is_password_changed'] = 'yes';
+        $user = $this->login_model->reset_password($data);
+        if(isset($user) && !empty($user)){
+            $response['status'] = true;
+            $response['message'] = 'Password reset successful';
+        }
+        else{
+            $response['status'] = false;
+            $response['message'] = 'Password reset failed';
         }
     }
+    else{
+        $response['status'] = false;
+        $response['message'] = 'Invalid request';
+    }
+
+    header('Content-Type: application/json');
+    echo json_encode($response);
+}
+
 }

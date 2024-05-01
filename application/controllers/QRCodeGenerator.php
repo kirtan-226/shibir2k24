@@ -24,6 +24,20 @@ class QRCodeGenerator extends CI_Controller {
 
     }
 
+    public function give_qr()
+{
+    $path = 'system/database/qr/'; // Assuming this is relative to your application
+    
+    // Display the existing images
+    $files = glob($path . "*.png");
+    foreach ($files as $file) {
+        echo "<center><img src='" . $file . "'></center>";
+    }
+}
+
+
+
+
     public function read_id() {
         $filePath = 'C:\Users\limba\OneDrive\Desktop\read.csv';
         

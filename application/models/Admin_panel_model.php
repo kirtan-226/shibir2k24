@@ -75,6 +75,22 @@ class Admin_panel_model extends CI_Model {
                     }
           }
 
+          public function get_permission($id)
+          {     
+
+                    $this->db->select('role');
+                    $this->db->where('shibir_id',$id);
+                    $role =  $this->db->get('yuvak_details')->row_array();
+                    var_dump($role);
+
+                    $this->db->select('*');
+                    $this->db->where('id',$role['role']);
+                    $permission = $this->db->get('roles')->row_array();
+
+                    return $permission;
+          }
+
+
           
 
 }

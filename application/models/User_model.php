@@ -19,18 +19,18 @@ class User_model extends CI_Model {
     public function get_by_id($id)
     {     
           $this->db->select('*');
-          $this->db->where('shibir_id',$id);
-          $this->db->where('deleted_at',null);
-          $user = $this->db->update('yuvak_details',$id)->row_array();
+          $this->db->where('shibir_id',$id['shibir_id']);
+        //   $this->db->where('deleted_at',null);
+          $user = $this->db->get('yuvak_details')->row_array();
         return $user;
     }
 
     public function get_yuvak_name($id)
     {     
         $this->db->select("CONCAT(firstname, ' ', middlename, ' ', lastname) AS name", FALSE);
-        $this->db->where('shibir_id', $id);
-        $this->db->where('deleted_at', null);
-        $user = $this->db->get('yuvak_details')->row();        
+        $this->db->where('shibir_id', $id['shibir_id']);
+        // $this->db->where('deleted_at', null);
+        $user = $this->db->get('shibir_users')->row_array();        
         return $user;
     }
 
@@ -38,7 +38,7 @@ class User_model extends CI_Model {
     {     
         $this->db->select('mandal');
         $this->db->where('shibir_id', $id);
-        $this->db->where('deleted_at', null);
+        // $this->db->where('deleted_at', null);
         $user = $this->db->get('yuvak_details')->row();        
         return $user;
     }

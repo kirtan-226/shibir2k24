@@ -28,15 +28,34 @@ class User extends CI_Controller {
 
         public function get_all_user(){                
             $users = $this->user_model->get_all_user();
-            var_dump($users);
-            return $users;
+        
+            header('Content-Type: application/json');
+            echo json_encode($users);
         }
 
-        public function get_by_id(){
+
+       public function get_by_id(){
+    $postData = file_get_contents("php://input");
+    $id['shibir_id'] = json_decode($postData, true);
+    $response = array();
+
+    if(isset($id) && !empty($id)){
+        $user = $this->user_model->get_by_id($id['shibir_id']);
+        $user['name'] = $this->user_model->get_yuvak_name($id['shibir_id']);
+        $response['user'] = $user;
+    }
+
+    header('Content-Type: application/json');
+    echo json_encode($response);
+}
+
+        public function get_mandal_id(){
             $postData = file_get_contents("php://input");
-            $id = json_decode($postData, true);
+            $id['shibir_id'] = json_decode($postData, true);
             if(isset($id) && !empty($id)){
-                $user = $this->user_model->get_by_id($id);
+                $user = $this->user_model->get_mandal_id($id['shibir_id']);
+                $user_name = $this->user_model->get_yuvak_name($id['shibir_id']);
+                var_dump($user_name,$user);
                 return $user;
             }
         }
