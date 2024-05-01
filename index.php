@@ -1,4 +1,6 @@
 <?php
+
+echo 'kirtan';
 /**
  * CodeIgniter
  *
