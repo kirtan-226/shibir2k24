@@ -25,4 +25,12 @@ class Login_model extends CI_Model {
           $user = $this->db->update('shibir_users',$data);
         return $user;
     }
+
+    public function forgot_password($data = [])
+    {
+        $this->db->where('shibir_id',$data['shibir_id']);
+        $this->db->where('phone_number',$data['pohne_number']);
+        $this->db->where('deleted_at',null);
+        $user = $this->db->update('shibir_users',$data);
+    }
 }

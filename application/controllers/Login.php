@@ -80,4 +80,34 @@ class Login extends CI_Controller {
     echo json_encode($response);
 }
 
+public function forgot_password(){
+    $postData = file_get_contents("php://input");
+    $data = json_decode($postData, true);
+    $x = $this->session->userdata('user_id') ?? '';
+    if($x != ''){
+        $data['shibir_id'] = $this->session->userdata('user_id');
+    }
+    $response = array();
+
+    if(isset($data) && !empty($data)){
+        $data['is_password_changed'] = 'yes';
+        $user = $this->login_model->forgot_pasword($data);
+        if(isset($user) && !empty($user)){
+            $response['status'] = true;
+            $response['message'] = 'Password reset successful';
+        }
+        else{
+            $response['status'] = false;
+            $response['message'] = 'Password reset failed';
+        }
+    }
+    else{
+        $response['status'] = false;
+        $response['message'] = 'Invalid request';
+    }
+
+    header('Content-Type: application/json');
+    echo json_encode($response);
+}
+
 }
