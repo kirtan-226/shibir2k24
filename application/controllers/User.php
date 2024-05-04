@@ -29,7 +29,6 @@ class User extends CI_Controller {
         public function get_all_user(){                
             $users = $this->user_model->get_all_user();
         
-            header('Content-Type: application/json');
             echo json_encode($users);
         }
 
@@ -45,7 +44,6 @@ class User extends CI_Controller {
         $response['user'] = $user;
     }
 
-    header('Content-Type: application/json');
     echo json_encode($response);
 }
 
