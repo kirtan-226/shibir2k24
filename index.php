@@ -1,6 +1,6 @@
 <?php
+ob_start();
 
-echo 'kirtan';
 /**
  * CodeIgniter
  *
@@ -315,3 +315,5 @@ switch (ENVIRONMENT)
  * And away we go...
  */
 require_once BASEPATH.'core/CodeIgniter.php';
+ob_end_flush();
+

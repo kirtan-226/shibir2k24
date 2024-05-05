@@ -22,11 +22,12 @@ class announcement_model extends CI_Model {
 
     }
 
-    public function get_annoeuncemnt()
-    {     $data['is_password_changed'] = 'yes';
-          $this->db->where('shibir_id',$data['shibir_id']);
-          $this->db->where('deleted_at',null);
-          $user = $this->db->update('shibir_users',$data);
-        return $user;
+    public function get_announcement()
+    {     
+        //   $data['is_password_changed'] = 'yes';
+        //   $this->db->where('shibir_id',$data['shibir_id']);
+        //   $this->db->where('deleted_at',null);
+          $announcements = $this->db->get('announcements')->result_array();
+        return $announcements;
     }
 }

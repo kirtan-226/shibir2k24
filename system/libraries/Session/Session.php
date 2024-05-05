@@ -107,7 +107,7 @@ class CI_Session {
 		$wrapper = new CI_SessionWrapper($class);
 		if (is_php('5.4'))
 		{
-			session_set_save_handler($wrapper, TRUE);
+// 			session_set_save_handler($wrapper, TRUE);
 		}
 		else
 		{
@@ -134,7 +134,7 @@ class CI_Session {
 			unset($_COOKIE[$this->_config['cookie_name']]);
 		}
 
-		session_start();
+// 		session_start();
 
 		// Is session ID auto-regeneration configured? (ignoring ajax requests)
 		if ((empty($_SERVER['HTTP_X_REQUESTED_WITH']) OR strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest')
@@ -300,7 +300,7 @@ class CI_Session {
 		}
 		else
 		{
-			ini_set('session.name', $params['cookie_name']);
+// 			ini_set('session.name', $params['cookie_name']);
 		}
 
 		isset($params['cookie_path']) OR $params['cookie_path'] = config_item('cookie_path');
@@ -325,14 +325,14 @@ class CI_Session {
 
 		if (is_php('7.3'))
 		{
-			session_set_cookie_params(array(
-				'lifetime' => $params['cookie_lifetime'],
-				'path'     => $params['cookie_path'],
-				'domain'   => $params['cookie_domain'],
-				'secure'   => $params['cookie_secure'],
-				'httponly' => TRUE,
-				'samesite' => $params['cookie_samesite']
-			));
+// 			session_set_cookie_params(array(
+// 				// 'lifetime' => $params['cookie_lifetime'],
+// 				'path'     => $params['cookie_path'],
+// 				'domain'   => $params['cookie_domain'],
+// 				'secure'   => $params['cookie_secure'],
+// 				'httponly' => TRUE,
+// 				// 'samesite' => $params['cookie_samesite']
+// 			));
 		}
 		else
 		{
@@ -362,10 +362,10 @@ class CI_Session {
 		$this->_config = $params;
 
 		// Security is king
-		ini_set('session.use_trans_sid', 0);
-		ini_set('session.use_strict_mode', 1);
-		ini_set('session.use_cookies', 1);
-		ini_set('session.use_only_cookies', 1);
+// 		ini_set('session.use_trans_sid', 0);
+// 		ini_set('session.use_strict_mode', 1);
+// 		ini_set('session.use_cookies', 1);
+// 		ini_set('session.use_only_cookies', 0);
 
 		$this->_configure_sid_length();
 	}
@@ -423,7 +423,7 @@ class CI_Session {
 			{
 				// Add as many more characters as necessary to reach at least 160 bits
 				$sid_length += (int) ceil((160 % $bits) / $bits_per_character);
-				ini_set('session.sid_length', $sid_length);
+				// ini_set('session.sid_length', $sid_length);
 			}
 		}
 

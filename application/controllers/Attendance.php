@@ -12,7 +12,7 @@ class Attendance extends CI_Controller {
           public function post_attendance(){
                     $postData = file_get_contents("php://input");
                     $data = json_decode($postData, true);
-                    $karyakar_id = $this->session->userdata('user_id');
+                    // $karyakar_id = $this->session->userdata('user_id');
                     $karyakar_mandal = $this->user_mode->get_mandal_by_id($karyakar);
                     $yuvak_mandal = $this->user_model->get_mandal_by_id($data['shibir_id']);
                     if($karyakar_mandal == $yuvak_mandal){
@@ -36,7 +36,7 @@ class Attendance extends CI_Controller {
           public function get_attendance_by_mandal(){
                     $postData = file_get_contents("php://input");
                     $data = json_decode($postData, true);
-                    $karyakar_id = $this->session->userdata('user_id');
+                    // $karyakar_id = $this->session->userdata('user_id');
                     if($karyakar_id){
                               $attendance = $this->attendance_model->get_attendance_by_mandal($karyakar_id);
                               foreach($attendance as $value){

@@ -35,7 +35,7 @@ class Import_yuvaks extends CI_Controller {
           public function get_attendance_by_mandal($data){
                     $postData = file_get_contents("php://input");
                     $data = json_decode($postData, true);
-                    $karyakar_id = $this->session->userdata('user_id');
+                    // $karyakar_id = $this->session->userdata('user_id');
                     if($data){
                               $attendance = $this->attendance_model->get_attendance_by_mandal($data);
                               foreach($attendance as $value){
