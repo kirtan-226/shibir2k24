@@ -23,41 +23,56 @@ if (isset($_SERVER['HTTP_ORIGIN'])) {
 
 
 
-class Login extends CI_Controller {
+class Quiz extends CI_Controller {
 
     public function __construct(){
         parent::__construct();
         $this->load->model('admin_panel_model');
         $this->load->model('login_model');
+        $this->load->model('quiz_model');
+
     }
 
-    public function import_question(){
-        $postData = file_get_contents("php://input");
-        $data = json_decode($postData, true);   
-        $user_details = $this->login_model->check_user($data);
-        $status;
-        if(isset($user_details) && !empty($user_details)){
-            // $this->session->set_userdata('user_id', $data['shibir_id']);
-            return true;
+    public function add_edit_quiz(){
+        
+        if($_SERVER["REQUEST_METHOD"] == "POST"){
+            $postData = file_get_contents("php://input");
+            $data = json_decode($postData, true);
+
+            $quiz_id = $this->quiz_model->get_quiz_id($data['quiz']);
+            $data['quiz'] = $quiz_id['id'];
+            $question_id = $this->quiz_model->add_question($data);
         }
         else{
-            return false;
+            $questions = $this->quiz_model->get_questions();
+            foreach ($questions as &$question) {
+                $quiz_place = $this->quiz_model->get_quiz_place($question['quiz']);
+                $str = str_replace('_', ' ', ucwords($quiz_place['place'], '_'));
+                $question['quiz'] = $str;
+            }
+            unset($question);
+            $data['questions'] = $questions;
+            $this->load->view('add_edit_quiz', $data);
         }
-    }
-        
+    } 
 
-    public function reset(){
-        $postData = file_get_contents("php://input");
-        $data = json_decode($postData, true);
-        if(isset($data) && !empty($data)){
-            $data['is_password_changed'] = 'yes';
-            $user = $this->login_model->reset_password($post_data);
-            if(isset($user) && !empty($user)){
-                    return true;
-            }
-            else{
-                    return false;
-            }
+    public function get_question($questionId) {
+        $question = $this->quiz_model->get_question_by_id($questionId);
+        $quiz_place = $this->quiz_model->get_quiz_place($question['quiz']);
+        $question['quiz'] = $quiz_place['place'];
+        // var_dump($question);die;
+        echo json_encode($question);
+    }
+
+    public function delete_question($questionId) {
+        $result = $this->quiz_model->delete_question($questionId);
+        // Assuming delete_question() returns a boolean indicating success or failure
+        if ($result) {
+            echo 'Question deleted successfully';
+        } else {
+            echo 'Failed to delete question';
         }
     }
+    
+    
 }
