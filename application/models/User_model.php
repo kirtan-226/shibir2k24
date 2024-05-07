@@ -28,13 +28,36 @@ class User_model extends CI_Model {
     public function get_yuvak_name($id)
     {     
         
-        $this->db->select("CONCAT(firstname, ' ', middlename, ' ', lastname) AS name", FALSE);
+        $this->db->select("CONCAT(firstname,' ', middlename,' ', lastname) AS name", FALSE);
         $this->db->where('shibir_id', $id['shibir_id']);
         // $this->db->where('deleted_at', null);
         
         $user = $this->db->get('shibir_users')->row_array();  
         // var_dump($user);die;
         return $user;
+    }
+    
+    public function get_yuvak_first_name($id)
+    {     
+        
+        $this->db->select("firstname");
+        $this->db->where('shibir_id', $id['shibir_id']);
+        // $this->db->where('deleted_at', null);
+        
+        $firstname = $this->db->get('shibir_users')->row_array();  
+        // var_dump($user);die;
+        return $firstname;
+    }
+    public function get_yuvak_last_name($id)
+    {     
+        
+        $this->db->select("lastname");
+        $this->db->where('shibir_id', $id['shibir_id']);
+        // $this->db->where('deleted_at', null);
+        
+        $lastname = $this->db->get('shibir_users')->row_array();  
+        // var_dump($lastname);die;
+        return $lastname;
     }
 
     // public function get_role($id)

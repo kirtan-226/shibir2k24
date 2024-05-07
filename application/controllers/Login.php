@@ -28,6 +28,7 @@ class Login extends CI_Controller {
         $this->load->model('login_model');
         $this->load->model('user_model');
         $this->load->model('admin_panel_model');
+        
         $this->session = $this->session;
     }
 
@@ -40,10 +41,28 @@ class Login extends CI_Controller {
 
         if (isset($user_details) && !empty($user_details)) {
             $response['status'] = true;
-            $response['data'] = array();
-        
+            // $response['data'] = array();
+            
+            $user = $this->user_model->get_by_id($data);
+            $name = $this->user_model->get_yuvak_name($data);
+            $firstname = $this->user_model->get_yuvak_first_name($data);
+            $last_name = $this->user_model->get_yuvak_last_name($data);
+            // var_dump($user['role']);die;
+            $response['status'] = 'true';
+            $bus_leader['shibir_id'] = $user['bus_leader'] ?? '';
+            $bus_leader = $this->user_model->get_yuvak_name($bus_leader);
+            $role = $this->admin_panel_model->get_role($user['role']);
+            // var_dump($role);die;
+            $user['name'] = $name['name'] ?? '';
+            $user['role'] = $role['role'] ?? '';
+            $user['firstname'] = $firstname['firstname'] ?? '';
+            $user['lastname'] = $last_name['lastname'] ?? '';
+            $user['bus_leader'] = $bus_leader['name'] ?? '';
+            $response['user'] = $user ?? '';
+            
             $this->session->set_userdata('user_id', $data['shibir_id']);
-            $response['data'] = $this->admin_panel_model->get_permission($data['shibir_id']);
+            $response['user']['permission'] = $this->admin_panel_model->get_permission($data['shibir_id']);
+            
         
             $response['message'] = 'Login successful';
         }

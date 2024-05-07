@@ -87,8 +87,16 @@ class Admin_panel_model extends CI_Model {
                     $this->db->where('id',$role['role']);
                     $permission = $this->db->get('roles')->row_array();
                     $permission['id'] = $id;
-                    // unset($permission['id']);
+                    unset($permission['id']);
                     return $permission;
+          }
+          
+          public function get_role($role_id){
+            //   var_dump('kirtan',$role_id);die;
+            $this->db->select('role');
+            $this->db->where('id',$role_id);
+            $role = $this->db->get('roles')->row_array();
+            return $role;
           }
 
 
