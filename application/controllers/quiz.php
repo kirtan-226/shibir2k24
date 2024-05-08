@@ -39,9 +39,19 @@ class Quiz extends CI_Controller {
             $postData = file_get_contents("php://input");
             $data = json_decode($postData, true);
 
-            $quiz_id = $this->quiz_model->get_quiz_id($data['quiz']);
-            $data['quiz'] = $quiz_id['id'];
-            $question_id = $this->quiz_model->add_question($data);
+            if(isset($data['question_id']) && !empty($data['question_id'])){
+                $postData = file_get_contents("php://input");
+                $data = json_decode($postData, true);
+                $quiz_id = $this->quiz_model->get_quiz_id($data['quiz']);
+                $data['quiz'] = $quiz_id['id'];
+                $question_id = $this->quiz_model->add_question($data);
+            }
+            else{
+                $quiz_id = $this->quiz_model->get_quiz_id($data['quiz']);
+                $data['quiz'] = $quiz_id['id'];
+                $question_id = $this->quiz_model->add_question($data);
+            }
+            return true;
         }
         else{
             $questions = $this->quiz_model->get_questions();

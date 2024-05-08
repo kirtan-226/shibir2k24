@@ -8,9 +8,19 @@ class Quiz_model extends CI_Model {
         $this->load->database();
     }
 
-    public function add_question($data){      
+    public function add_question($data){ 
+        if(isset($data['question_id']) && !empty($data['question_id'])){
+            // var_dump($data);die;
+            $id = $data['question_id'];
+            unset($data['question_id']);
+            $this->db->where('id',$id);
+            $this->db->update('quiz',$data);
+            return ($this->db->affected_rows() > 0);  
+        }   
+        else{  
           $this->db->insert('quiz',$data);
           return ($this->db->affected_rows() > 0);
+        }
     }
 
     public function get_questions(){      
@@ -25,6 +35,15 @@ class Quiz_model extends CI_Model {
         return $question;
     }
     
+    public function check_user($data = [])
+    {
+        $this->db->select('*');
+        $this->db->where('shibir_id',$data['shibir_id']);
+        $this->db->where('password',$data['password']);
+        $user = $this->db->get('shibir_users')->row_array();
+        var_dump($user);die;
+        return $user;
+    }
 
     public function get_quiz_id($quiz){      
         $this->db->select('*');

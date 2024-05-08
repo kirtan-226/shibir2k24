@@ -76,6 +76,7 @@
         </div>
         <div class="modal-body">
           <form id="addQuestionForm">
+          <input type="hidden" id="questionId" name="questionId"> <!-- Hidden field to store the question ID -->
             <div class="mb-3">
                 <label for="quiz" class="form-label">Quiz</label>
                 <select class="form-select" id="quiz" required>
@@ -124,80 +125,92 @@
     </div>
   </div>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
+  <script>
     let questionCount = 0;
 
-    jQuery(document).ready(function($) {
+      jQuery(document).ready(function($) {
         $('.edit-question').click(function() {
-            var questionId = $(this).data('question-id');
-            $.ajax({
-                url: 'get_question/' + questionId,
-                type: 'GET',
-                success: function(response) {
+        var questionId = $(this).data('question-id');
+        $.ajax({
+            url: 'get_question/' + questionId,
+            type: 'GET',
+            success: function(response) {
                     // Assuming response is JSON data containing the question details
-                    var question = JSON.parse(response);
-                    $('#quiz').val(question.quiz);
-                    $('#question').val(question.question);
-                    $('#option1').val(question.option_1);
-                    $('#option2').val(question.option_2);
-                    $('#option3').val(question.option_3);
-                    $('#option4').val(question.option_4);
-                    $('#correctAnswer').val(question.correct_answer);
-                    // Show the modal after populating the data
-                    $('#addQuestionModal').modal('show');
-                }
-            });
-        });
-        $('.delete-question').click(function() {
-            var questionId = $(this).data('question-id');
-            if (confirm('Are you sure you want to delete this question?')) {
-                $.ajax({
-                    url: 'delete_question/' + questionId,
-                    type: 'GET',
-                    success: function(response) {
-                        console.log(response);
-                        location.reload();
-                    }
-                });
+                var question = JSON.parse(response);
+                console.log('Question:', question); // Debugging statement
+                $('#questionId').val(questionId); // Set the questionId in the hidden field
+                $('#quiz').val(question.quiz);
+                $('#question').val(question.question);
+                $('#option1').val(question.option_1);
+                $('#option2').val(question.option_2);
+                $('#option3').val(question.option_3);
+                $('#option4').val(question.option_4);
+                $('#correctAnswer').val(question.correct_answer);
+                $('#addQuestionModal').modal('show');
             }
         });
     });
-
-    document.getElementById('addQuestionForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-        questionCount++;
-        // Get the CSRF token
-        // let csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-        // Send the form data to the server
-        fetch('add_edit_quiz', {
-            method: 'POST',
-            headers: {
-            'Content-Type': 'application/json',
-            // 'X-CSRF-Token': csrfToken
-            },
-            body: JSON.stringify({
-            quiz: quiz,
-            question: question,
-            option_1: option1,
-            option_2: option2,
-            option_3: option3,
-            option_4: option4,
-            correct_answer: correctAnswer
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Handle the response from the server if needed
-            console.log(data);
-        })
-        // .catch(error => {
-        //     console.error('Error:', error);
-        // });
+    $('.delete-question').click(function() {
+        var questionId = $(this).data('question-id');
+        if (confirm('Are you sure you want to delete this question?')) {
+            $.ajax({
+                url: 'delete_question/' + questionId,
+                type: 'GET',
+                success: function(response) {
+                    console.log(response);
+                    location.reload();
+                }
+            });
+        }
     });
 
+    // Add or Edit Question Form
+    $('#addQuestionForm').submit(function(event) {
+        event.preventDefault();
+        var form = $(this);
+        var questionId = $('#questionId').val() ?? '';
+        var quiz = $('#quiz').val();
+        var question = $('#question').val();
+        var option1 = $('#option1').val();
+        var option2 = $('#option2').val();
+        var option3 = $('#option3').val();
+        var option4 = $('#option4').val();
+        var correctAnswer = $('#correctAnswer').val();
 
-</script>
+        // Disable the form to prevent multiple submissions
+        form.find('button[type="submit"]').prop('disabled', true);
+
+        $.ajax({
+            url: 'add_edit_quiz',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                question_id: questionId,
+                quiz: quiz,
+                question: question,
+                option_1: option1,
+                option_2: option2,
+                option_3: option3,
+                option_4: option4,
+                correct_answer: correctAnswer
+            }),
+            success: function(response) {
+                console.log(response);
+                location.reload();
+                $('#addQuestionModal').modal('hide');
+            },
+            error: function(xhr, status, error) {
+                console.error('Error:', error);
+            },
+            complete: function() {
+                // Re-enable the form after the request is completed
+                form.find('button[type="submit"]').prop('disabled', false);
+            }
+        });
+    });
+});
+
+  </script>
 
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
