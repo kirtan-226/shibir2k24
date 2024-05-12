@@ -33,56 +33,75 @@ class Quiz extends CI_Controller {
 
     }
 
-    public function add_edit_quiz(){
+    public function get_questions() {
+          date_default_timezone_set('Asia/Kolkata');
+          $currentDateTime = date('Y-m-d H:i:s');
+          $hour = date('H', strtotime($currentDateTime));
+          // var_dump($currentDateTime);die;
+          
+          if ($currentDateTime >= '2024-05-28 21:00:00' && $currentDateTime <= '2024-05-29 6:00:00') {
+                    //bharuch
+                    $quiz = 'bharuch';
+          } elseif ($currentDateTime >= '2024-05-29 09:30:00' && $currentDateTime <= '2024-05-29 13:30:00') {
+                    //dhule
+                    $quiz = 'dhule';
+          } elseif ($currentDateTime >= '2024-05-30 18:30:00' && $currentDateTime <= '2024-05-29 20:30:00') {
+                    //nashik
+                    $quiz = 'nashik';
+          } elseif ($currentDateTime >= '2024-05-30 12:30:00' && $currentDateTime <= '2024-05-29 15:30:00') {
+                    //session 1
+                    $quiz = 'shibir_session_1';
+          } elseif ($currentDateTime >= '2024-05-28 18:30:00' && $currentDateTime <= '2024-05-29 20:30:00') {
+                    //session 2
+                    $quiz = 'shibir_session_2';
+          } elseif ($currentDateTime >= '2024-05-28 22:00:00' && $currentDateTime <= '2024-05-29 23:00:00') {
+                    //session 3
+                    $quiz = 'shibir_session_3';
+          } elseif ($currentDateTime >= '2024-05-31 12:00:00' && $currentDateTime <= '2024-05-31 13:00:00') {
+                    //nashik darshan
+                    $quiz = 'nashik_darshan';
+          } elseif ($currentDateTime >= '2024-05-31 15:00:00' && $currentDateTime <= '2024-05-29 18:00:00') {
+                    //trambakeshwar
+                    $quiz = 'trambakeshwar';
+          } elseif ($currentDateTime >= '2024-06-01 08:30:00' && $currentDateTime <= '2024-06-01 11:30:00') {
+                    //pune
+                    $quiz = 'pune';
+          } elseif ($currentDateTime >= '2024-06-01 19:30:00' && $currentDateTime <= '2024-06-01 20:30:00') {
+                    //imagica
+                    $quiz = 'imagica';
+          } elseif ($currentDateTime >= '2024-06-02 12:00:00' && $currentDateTime <= '2024-06-02 13:00:00') {
+                    //session 4
+                    $quiz = 'shibir_session_4';
+          }
+          
+        $quiz_id = $this->quiz_model->get_quiz_id($quiz);
+        $questions = $this->quiz_model->get_question_by_quiz_id($quiz_id['id']);
+//         $total_questions = count($questions);
+//         $random_keys = array_rand($questions, $total_questions); 
+//         $random_questions = array_intersect_key($questions, array_flip($random_keys));
+        shuffle($questions);
         
-        if($_SERVER["REQUEST_METHOD"] == "POST"){
-            $postData = file_get_contents("php://input");
-            $data = json_decode($postData, true);
-
-            if(isset($data['question_id']) && !empty($data['question_id'])){
-                $postData = file_get_contents("php://input");
-                $data = json_decode($postData, true);
-                $quiz_id = $this->quiz_model->get_quiz_id($data['quiz']);
-                $data['quiz'] = $quiz_id['id'];
-                $question_id = $this->quiz_model->add_question($data);
-            }
-            else{
-                $quiz_id = $this->quiz_model->get_quiz_id($data['quiz']);
-                $data['quiz'] = $quiz_id['id'];
-                $question_id = $this->quiz_model->add_question($data);
-            }
-            return true;
-        }
-        else{
-            $questions = $this->quiz_model->get_questions();
-            foreach ($questions as &$question) {
-                $quiz_place = $this->quiz_model->get_quiz_place($question['quiz']);
-                $str = str_replace('_', ' ', ucwords($quiz_place['place'], '_'));
-                $question['quiz'] = $str;
-            }
-            unset($question);
-            $data['questions'] = $questions;
-            $this->load->view('add_edit_quiz', $data);
-        }
-    } 
-
-    public function get_question($questionId) {
-        $question = $this->quiz_model->get_question_by_id($questionId);
-        $quiz_place = $this->quiz_model->get_quiz_place($question['quiz']);
-        $question['quiz'] = $quiz_place['place'];
-        // var_dump($question);die;
-        echo json_encode($question);
-    }
-
-    public function delete_question($questionId) {
-        $result = $this->quiz_model->delete_question($questionId);
-        // Assuming delete_question() returns a boolean indicating success or failure
-        if ($result) {
-            echo 'Question deleted successfully';
-        } else {
-            echo 'Failed to delete question';
-        }
+        foreach ($questions as &$question) {
+                    $options = array($question['option_1'], $question['option_2'], $question['option_3'], $question['option_4']);
+                    shuffle($options);
+                    $question['option_1'] = $options[0];
+                    $question['option_2'] = $options[1];
+                    $question['option_3'] = $options[2];
+                    $question['option_4'] = $options[3];
+          }
+          unset($question); 
+          $response['status'] = true;
+          $reponse['$questions'] = $questions; 
+//         $questions['quiz'] = $quiz_id['place'];
+          echo json_encode($response);
     }
     
-    
+    public function post_answers(){
+          $postData = file_get_contents("php://input");
+          $answers = json_decode($postData, true);
+
+          $shibir_id = $answers['shibir_id'];
+          
+
+    }
 }

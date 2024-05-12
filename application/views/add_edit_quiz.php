@@ -39,6 +39,15 @@
   <div class="container">
     <h1>Quiz Admin Panel</h1>
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addQuestionModal">Add Question</button>
+    <div class="mb-3">
+        <label for="quizFilter" class="form-label">Filter by Quiz Place</label>
+        <select class="form-select" id="quizFilter">
+            <option value="">Select a place</option>
+            <?php foreach($quiz_place as $quiz): ?>
+                <option value="<?php echo $quiz['id']; ?>"><?php echo str_replace('_', ' ', ucwords($quiz['place'], '_')); ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
     <hr>
     <div id="questions">
 
@@ -124,93 +133,153 @@
       </div>
     </div>
   </div>
+  
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script>
-    let questionCount = 0;
+    $(document).ready(function() {
+        // Store current filter values
+        var currentFilterValues = {};
 
-      jQuery(document).ready(function($) {
-        $('.edit-question').click(function() {
-        var questionId = $(this).data('question-id');
-        $.ajax({
-            url: 'get_question/' + questionId,
-            type: 'GET',
-            success: function(response) {
-                    // Assuming response is JSON data containing the question details
-                var question = JSON.parse(response);
-                console.log('Question:', question); // Debugging statement
-                $('#questionId').val(questionId); // Set the questionId in the hidden field
-                $('#quiz').val(question.quiz);
-                $('#question').val(question.question);
-                $('#option1').val(question.option_1);
-                $('#option2').val(question.option_2);
-                $('#option3').val(question.option_3);
-                $('#option4').val(question.option_4);
-                $('#correctAnswer').val(question.correct_answer);
-                $('#addQuestionModal').modal('show');
-            }
-        });
-    });
-    $('.delete-question').click(function() {
-        var questionId = $(this).data('question-id');
-        if (confirm('Are you sure you want to delete this question?')) {
+        // Function to retrieve questions based on filter
+        function getQuestions(filterId) {
+            var filterValue = currentFilterValues[filterId];
+            if (!filterValue) return;
             $.ajax({
-                url: 'delete_question/' + questionId,
+                url: 'filter_question',
                 type: 'GET',
+                data: { quiz: filterValue },
                 success: function(response) {
-                    console.log(response);
-                    location.reload();
+                    // Update the questions displayed
+                    $('#questions').empty(); // Clear existing questions
+                    $.each(response.questions, function(index, question) {
+                        // Append questions to the list
+                        var questionHtml = `
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">${question.quiz}</h5>
+                                    <h5 class="card-title">Question : ${question.question}</h5>
+                                    <p class="card-text">a) ${question.option_1}</p>
+                                    <p class="card-text">b) ${question.option_2}</p>
+                                    <p class="card-text">c) ${question.option_3}</p>
+                                    <p class="card-text">d) ${question.option_4}</p>
+                                    <p class="card-text">Correct Answer: ${question.correct_answer}</p>
+                                    <!-- Edit and Delete buttons -->
+                                    <div class="btn-group" role="group" aria-label="Question Actions">
+                                        <button type="button" class="btn btn-primary edit-question" data-question-id="${question.id}">Edit</button>
+                                        <button type="button" class="btn btn-danger delete-question" data-question-id="${question.id}" style="margin-top: 10px;">Delete</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        $('#questions').append(questionHtml);
+                    });
                 }
             });
         }
-    });
 
-    // Add or Edit Question Form
-    $('#addQuestionForm').submit(function(event) {
-        event.preventDefault();
-        var form = $(this);
-        var questionId = $('#questionId').val() ?? '';
-        var quiz = $('#quiz').val();
-        var question = $('#question').val();
-        var option1 = $('#option1').val();
-        var option2 = $('#option2').val();
-        var option3 = $('#option3').val();
-        var option4 = $('#option4').val();
-        var correctAnswer = $('#correctAnswer').val();
+        // Keep track of filter changes
+        $('#quizFilter').change(function() {
+            var filterId = $(this).attr('id');
+            var filterValue = $(this).val();
+            currentFilterValues[filterId] = filterValue;
+            getQuestions(filterId);
+        });
 
-        // Disable the form to prevent multiple submissions
-        form.find('button[type="submit"]').prop('disabled', true);
+        // Load questions based on initial filter values
+        $('#quizFilter').each(function() {
+            var filterId = $(this).attr('id');
+            currentFilterValues[filterId] = $(this).val();
+            getQuestions(filterId);
+        });
 
-        $.ajax({
-            url: 'add_edit_quiz',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                question_id: questionId,
-                quiz: quiz,
-                question: question,
-                option_1: option1,
-                option_2: option2,
-                option_3: option3,
-                option_4: option4,
-                correct_answer: correctAnswer
-            }),
-            success: function(response) {
-                console.log(response);
-                location.reload();
-                $('#addQuestionModal').modal('hide');
-            },
-            error: function(xhr, status, error) {
-                console.error('Error:', error);
-            },
-            complete: function() {
-                // Re-enable the form after the request is completed
-                form.find('button[type="submit"]').prop('disabled', false);
+        // Edit Question Modal (Using Event Delegation)
+        $(document).on('click', '.edit-question', function() {
+            var questionId = $(this).data('question-id');
+            $.ajax({
+                url: 'get_question/' + questionId,
+                type: 'GET',
+                success: function(response) {
+                    var question = JSON.parse(response);
+                    // Reset modal fields
+                    $('#addQuestionForm').trigger('reset');
+                    $('#questionId').val(questionId);
+                    $('#quiz').val(question.quiz);
+                    $('#question').val(question.question);
+                    $('#option1').val(question.option_1);
+                    $('#option2').val(question.option_2);
+                    $('#option3').val(question.option_3);
+                    $('#option4').val(question.option_4);
+                    $('#correctAnswer').val(question.correct_answer);
+                    $('#addQuestionModal').modal('show');
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error:', error);
+                }
+            })
+        });
+
+        // Delete Question (Using Event Delegation)
+        $(document).on('click', '.delete-question', function() {
+            var questionId = $(this).data('question-id');
+            if (confirm('Are you sure you want to delete this question?')) {
+                $.ajax({
+                    url: 'delete_question/' + questionId,
+                    type: 'GET',
+                    success: function(response) {
+                        location.reload();
+                        getQuestions(currentFilterValues); // Reload questions with the current filter
+                    }
+                });
             }
         });
-    });
-});
 
-  </script>
+        // Add or Edit Question Form
+        $('#addQuestionForm').submit(function(event) {
+            event.preventDefault();
+            var form = $(this);
+            var questionId = $('#questionId').val() ?? '';
+            var quiz = $('#quiz').val();
+            var question = $('#question').val();
+            var option1 = $('#option1').val();
+            var option2 = $('#option2').val();
+            var option3 = $('#option3').val();
+            var option4 = $('#option4').val();
+            var correctAnswer = $('#correctAnswer').val();
+
+            // Disable the form to prevent multiple submissions
+            form.find('button[type="submit"]').prop('disabled', true);
+
+            $.ajax({
+                url: 'add_edit_quiz',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    question_id: questionId,
+                    quiz: quiz,
+                    question: question,
+                    option_1: option1,
+                    option_2: option2,
+                    option_3: option3,
+                    option_4: option4,
+                    correct_answer: correctAnswer
+                }),
+                success: function(response) {
+                    // location.reload();
+                    getQuestions(currentFilterValues); // Reload questions with the current filter
+                    $('#addQuestionModal').modal('hide');
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error:', error);
+                },
+                complete: function() {
+                    // Re-enable the form after the request is completed
+                    form.find('button[type="submit"]').prop('disabled', false);
+                }
+            });
+        });
+    });
+</script>
+
 
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

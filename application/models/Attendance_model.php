@@ -9,10 +9,26 @@ class Attendance_model extends CI_Model {
     }
 
     public function post_attendance($data = [])
-    {
+    {   
+        var_dump($data);die;
+        $this->db->select('*');
         $this->db->where('shibir_id',$data['shibir_id']);
-        $announcement = $this->db->update('yuvak_details',$data);
-        return $user;
+        $attendance = $this->db->get('attendance')->row_array();
+
+        if(isset($attendance) && !empty($attendance)){
+            foreach($attendance as $value){
+                if($value['attendance_for'] == $data['attendance_for']){
+                    return false;
+                }
+            }
+            $attendance = $this->db->insert('attendance',$data);
+            return true;
+        }
+        else{
+            $attendance = $this->db->insert('attendance',$data);
+            return true;
+        }
+        return $attendance;
     }
 
     public function get_attendance_by_mandal($data = [])

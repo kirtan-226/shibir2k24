@@ -9,17 +9,18 @@ class Quiz_model extends CI_Model {
     }
 
     public function add_question($data){ 
-        if(isset($data['question_id']) && !empty($data['question_id'])){
-            // var_dump($data);die;
+        // var_dump($data['question_id']);die;
+        if($data['question_id'] == ''){  
+            unset($data['question_id']);
+            $this->db->insert('quiz',$data);
+            return ($this->db->affected_rows() > 0);
+        }   
+        else{  
             $id = $data['question_id'];
             unset($data['question_id']);
             $this->db->where('id',$id);
             $this->db->update('quiz',$data);
-            return ($this->db->affected_rows() > 0);  
-        }   
-        else{  
-          $this->db->insert('quiz',$data);
-          return ($this->db->affected_rows() > 0);
+            return ($this->db->affected_rows() > 0);
         }
     }
 
@@ -28,10 +29,30 @@ class Quiz_model extends CI_Model {
         return $question;
     }
 
+    public function pagination($quizId, $perPage, $offset) {
+        $this->db->limit($perPage, $offset);
+        $questions = $this->db->get('quiz')->result_array();
+        return $questions;
+    }
+    
+    
+
+    public function get_total_questions() {
+        return $this->db->count_all_results('quiz');
+    }
+    
+
     public function get_question_by_id($id){
         $this->db->select('*');
         $this->db->where('id',$id);      
         $question = $this->db->get('quiz')->row_array();
+        return $question;
+    }
+
+    public function get_question_by_quiz_id($id){
+        $this->db->select('*');
+        $this->db->where('quiz',$id);      
+        $question = $this->db->get('quiz')->result_array();
         return $question;
     }
     
@@ -41,7 +62,6 @@ class Quiz_model extends CI_Model {
         $this->db->where('shibir_id',$data['shibir_id']);
         $this->db->where('password',$data['password']);
         $user = $this->db->get('shibir_users')->row_array();
-        var_dump($user);die;
         return $user;
     }
 
@@ -56,6 +76,12 @@ class Quiz_model extends CI_Model {
         $this->db->select('*');
         $this->db->where('id',$quiz);
         $quiz = $this->db->get('quiz_place')->row_array();
+        return $quiz;
+    }
+
+    public function get_all_quiz_place(){   
+        $this->db->select('*');
+        $quiz = $this->db->get('quiz_place')->result_array();
         return $quiz;
     }
 

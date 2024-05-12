@@ -35,24 +35,46 @@ class Attendance extends CI_Controller {
                     $postData = file_get_contents("php://input");
                     $data = json_decode($postData, true);
                     // $karyakar_id = $this->session->userdata('user_id');
-                    $karyakar_mandal = $this->user_mode->get_mandal_by_id($karyakar);
-                    $yuvak_mandal = $this->user_model->get_mandal_by_id($data['shibir_id']);
+                    $karyakar_mandal = $this->user_model->get_mandal_by_id($data['shibir_id']);
+                    $yuvak_mandal = $this->user_model->get_mandal_by_id($data['yuvak_id']);
+
+                    // if ($currentDateTime >= '2024-05-28 21:00:00' && $currentDateTime <= '2024-05-29 6:00:00') {
+                    //     //bharuch
+                    //     $quiz = 'bharuch';
+                    // } elseif ($currentDateTime >= '2024-05-29 09:30:00' && $currentDateTime <= '2024-05-29 13:30:00') {
+                    //             //dhule
+                    //             $quiz = 'dhule';
+                    // } elseif ($currentDateTime >= '2024-05-30 18:30:00' && $currentDateTime <= '2024-05-29 20:30:00') {
+                    //             //nashik
+                    //             $quiz = 'nashik';
+                    // } elseif ($currentDateTime >= '2024-05-30 12:30:00' && $currentDateTime <= '2024-05-29 15:30:00') {
+                    //             //session 1
+                    //             $quiz = 'shibir_session_1';
+                    // } elseif ($currentDateTime >= '2024-05-28 18:30:00' && $currentDateTime <= '2024-05-29 20:30:00') {
+                    //             //session 2
+                    //             $quiz = 'shibir_session_2';
+                    // }
+
+                    $karyakram = 'at_bharuch';
                     if($karyakar_mandal == $yuvak_mandal){
-                              $data = $yuvak_mandal;
-                              $data = $postData;
-                              foreach($karyakram as $value){
-                                        if($karyakram = 'at_bharuch'){
-                                                  $user_details = $this->attendance_model->post_attendance($postData);
-                                        }
-                                        else{
-                                                  if($value['date_time'] && strtotime($value['date_time']) >= strtotime('-15 minutes', strtotime($currentDateTime)) && strtotime($value['date_time']) <= strtotime('+30 minutes', strtotime($currentDateTime))) {
-                                                            $karyakram = $this->attendance_model->get_karyakram($value['date_time']);
-                                                            $postData['karyakram'] = $karyakram;
-                                                            $user_details = $this->attendance_model->post_attendance($postData);
-                                                  }
-                                        }
-                              }
+                        $new_data['mandal'] = $yuvak_mandal;
+                        $new_data['shibir_id'] = $data['yuvak_id'];
+                        $new_data['attendance_for'] = $karyakram;
+                        $user_details = $this->attendance_model->post_attendance($new_data);
+                        if($user_details == true){
+                            $response['status'] = 'true';
+                            $response['message'] = 'Thank you for attendance';
+                        }
+                        else{
+                            $response['status'] = 'false';
+                            $response['message'] = 'Attendance already done';
+                        }
                     }
+                    else{
+                        $response['status'] = 'false';
+                        $response['message'] = ['Yuvak is not of the mandal'.$karyakar_mandal];
+                    }
+                    echo json_encode($response);
           }
 
           public function get_attendance_by_mandal(){
