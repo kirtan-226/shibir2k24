@@ -74,7 +74,7 @@ class User_model extends CI_Model {
         $this->db->select('mandal');
         $this->db->where('shibir_id', $id);
         // $this->db->where('deleted_at', null);
-        $user = $this->db->get('yuvak_details')->row();        
+        $user = $this->db->get('yuvak_details')->row_array();        
         return $user;
     }
 

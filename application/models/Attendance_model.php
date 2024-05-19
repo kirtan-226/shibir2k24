@@ -10,13 +10,14 @@ class Attendance_model extends CI_Model {
 
     public function post_attendance($data = [])
     {   
-        var_dump($data);die;
         $this->db->select('*');
         $this->db->where('shibir_id',$data['shibir_id']);
-        $attendance = $this->db->get('attendance')->row_array();
+        $attendance = $this->db->get('attendance')->result_array();
 
         if(isset($attendance) && !empty($attendance)){
+            
             foreach($attendance as $value){
+                
                 if($value['attendance_for'] == $data['attendance_for']){
                     return false;
                 }

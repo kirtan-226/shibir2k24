@@ -100,6 +100,7 @@
                     <option value="imagica">Imagica</option>
                     <option value="tithal">Tithal</option>
                     <option value="navsari">Navsari</option>
+                    <option value="nashik">Nashik</option>
                 </select>
             </div>
 
@@ -144,6 +145,7 @@
         function getQuestions(filterId) {
             var filterValue = currentFilterValues[filterId];
             if (!filterValue) return;
+
             $.ajax({
                 url: 'filter_question',
                 type: 'GET',
@@ -215,7 +217,7 @@
                 error: function(xhr, status, error) {
                     console.error('Error:', error);
                 }
-            })
+            });
         });
 
         // Delete Question (Using Event Delegation)
@@ -226,7 +228,6 @@
                     url: 'delete_question/' + questionId,
                     type: 'GET',
                     success: function(response) {
-                        location.reload();
                         getQuestions(currentFilterValues); // Reload questions with the current filter
                     }
                 });
@@ -264,7 +265,7 @@
                     correct_answer: correctAnswer
                 }),
                 success: function(response) {
-                    // location.reload();
+                    location.reload();
                     getQuestions(currentFilterValues); // Reload questions with the current filter
                     $('#addQuestionModal').modal('hide');
                 },

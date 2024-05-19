@@ -23,6 +23,27 @@ class Quiz_model extends CI_Model {
             return ($this->db->affected_rows() > 0);
         }
     }
+    
+    public function post_answers($data){
+        $this->db->insert('quiz_options',$data);
+    }
+    
+    public function post_marks($data){
+        $this->db->insert('quiz_results',$data);
+    }
+    
+    public function get_quiz_results(){
+        $this->db->select('*');
+        $results = $this->db->get('quiz_results')->result_array();
+        return $results;
+    }
+    
+    public function get_quiz_result_by_id($id){
+        $this->db->select('*');
+        $this->db->where('shibir_id',$id['shibir_id']);
+        $results = $this->db->get('quiz_results')->result_array();
+        return $results;
+    }
 
     public function get_questions(){      
         $question = $this->db->get('quiz')->result_array();

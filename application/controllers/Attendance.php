@@ -55,9 +55,9 @@ class Attendance extends CI_Controller {
                     //             $quiz = 'shibir_session_2';
                     // }
 
-                    $karyakram = 'at_bharuch';
+                    $karyakram = 'shibir_session_2';
                     if($karyakar_mandal == $yuvak_mandal){
-                        $new_data['mandal'] = $yuvak_mandal;
+                        $new_data = $yuvak_mandal;
                         $new_data['shibir_id'] = $data['yuvak_id'];
                         $new_data['attendance_for'] = $karyakram;
                         $user_details = $this->attendance_model->post_attendance($new_data);
@@ -72,7 +72,7 @@ class Attendance extends CI_Controller {
                     }
                     else{
                         $response['status'] = 'false';
-                        $response['message'] = ['Yuvak is not of the mandal'.$karyakar_mandal];
+                        $response['message'] = 'Yuvak is not of your mandal';
                     }
                     echo json_encode($response);
           }

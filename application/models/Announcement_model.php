@@ -10,16 +10,7 @@ class announcement_model extends CI_Model {
 
     public function update_announcement($data = [])
     {
-          if(isset($data['id']) && !empty($data['id']))
-          {
-                    $this->db->select('*');
-                    $this->db->where('id',$data['id']);
-                    $this->db->update('announcements',$data);
-          }
-          else{
-                    $user = $this->db->insert('announcements',$data);
-          }
-
+        $user = $this->db->insert('announcements',$data);
     }
 
     public function get_announcement()
@@ -28,6 +19,8 @@ class announcement_model extends CI_Model {
         //   $this->db->where('shibir_id',$data['shibir_id']);
         //   $this->db->where('deleted_at',null);
           $announcements = $this->db->get('announcements')->result_array();
+           // unset the reference to avoid accidental modification later
+
         return $announcements;
     }
 }
