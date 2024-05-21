@@ -28,7 +28,7 @@ class User_model extends CI_Model {
     public function get_yuvak_name($id)
     {     
         
-        $this->db->select("CONCAT(firstname,' ', middlename,' ', lastname) AS name", FALSE);
+        $this->db->select("CONCAT(firstname,' ', lastname) AS name", FALSE);
         $this->db->where('shibir_id', $id['shibir_id']);
         // $this->db->where('deleted_at', null);
         
@@ -68,6 +68,30 @@ class User_model extends CI_Model {
     //     $user = $this->db->get('shibir_users')->row_array();        
     //     return $user;
     // }
+    
+     public function get_phone_number($id){
+        $this->db->select('phone_number');
+        $this->db->where('shibir_id', $id['shibir_id']);
+        // $this->db->where('deleted_at', null);
+        $user = $this->db->get('yuvak_details')->row_array();        
+        return $user;
+     }
+     
+     public function check_registrar($id){
+        $this->db->select('*');
+        $this->db->where('shibir_id', $id['shibir_id']);
+        // $this->db->where('deleted_at', null);
+        $user = $this->db->get('registrar')->row_array();        
+        return $user ? true : false;
+     }
+     
+     public function get_qr($id){
+        $this->db->select('api');
+        $this->db->where('qr_code', $id['shibir_id']);
+        // $this->db->where('deleted_at', null);
+        $user = $this->db->get('qr_code')->row_array();        
+        return $user;
+     }
 
     public function get_mandal_by_id($id)
     {     

@@ -26,13 +26,28 @@ if (isset($_SERVER['HTTP_ORIGIN'])) {
 class Admin_panel extends CI_Controller {
 
           public function __construct(){
-                    
+                      parent::__construct();
+                    $this->load->model('admin_panel_model');
           }
 
-          public function index()
+          public function detail_for_bus_leader()
           {
-
-                    $this->load->view('admin_dashboard');
+                $postData = file_get_contents("php://input");
+                $data = json_decode($postData, true);
+                
+                $is_leader = $this->admin_panel_model->check_leader($data);
+                if($is_leader = true){
+                    $yuvaks = $this->admin_panel_model->get_bus_yuvak($data);
+                }
+                if(isset($yuvaks) && !empty($yuvaks)){
+                    $response['yuvaks'] = $yuvaks;
+                    $response['status'] = true;
+                }
+                else{
+                    $response['status'] = false;
+                }
+                echo json_encode($response);
+                    
           }
 
 

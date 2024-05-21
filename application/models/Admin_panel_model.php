@@ -98,7 +98,26 @@ class Admin_panel_model extends CI_Model {
             $role = $this->db->get('roles')->row_array();
             return $role;
           }
+          
+          public function check_leader($data){
+            //   var_dump('kirtan',$role_id);die;
+            $this->db->select('*');
+            $this->db->where('leader_id_1',$data['shibir_id']);
+            $this->db->or_where('leader_id_2',$data['shibir_id']);
+            $role = $this->db->get('bus_leader_details')->row_array();
+            return $role ? true : false;
+          }
+          
+          public function get_bus_yuvak($data){
+            //   var_dump('kirtan',$role_id);die;
+            $this->db->select('*');
+            $this->db->where('bus_leader_1',$data['shibir_id']);
+            $this->db->or_where('bus_leader_2',$data['shibir_id']);
+            $yuvaks = $this->db->get('yuvak_details')->result_array();
+            return $yuvaks;
+          }
 
+        
 
           
 

@@ -49,20 +49,43 @@ class Login extends CI_Controller {
             $last_name = $this->user_model->get_yuvak_last_name($data);
             // var_dump($user['role']);die;
             $response['status'] = 'true';
-            $bus_leader['shibir_id'] = $user['bus_leader'] ?? '';
-            $bus_leader = $this->user_model->get_yuvak_name($bus_leader);
+            $shibir_id['shibir_id'] = $user['bus_leader_1'] ?? '';
+            $bus_leader_1 = $this->user_model->get_yuvak_name($shibir_id);
+            $bus_leader_1_no = $this->user_model->get_phone_number($shibir_id);
+            $shibir_id['shibir_id'] = $user['bus_leader_2'] ?? '';
+            $bus_leader_2 = $this->user_model->get_yuvak_name($shibir_id);
+            $bus_leader_2_no = $this->user_model->get_phone_number($shibir_id);
             $role = $this->admin_panel_model->get_role($user['role']);
-            // var_dump($role);die;
+            
             $user['name'] = $name['name'] ?? '';
             $user['role'] = $role['role'] ?? '';
             $user['firstname'] = $firstname['firstname'] ?? '';
             $user['lastname'] = $last_name['lastname'] ?? '';
-            $user['bus_leader'] = $bus_leader['name'] ?? '';
+            $user['bus_leader_1'] = $bus_leader_1['name'] ?? '';
+            $user['bus_leader_2'] = $bus_leader_2['name'] ?? '';
+            $user['bus_leader_1_no'] = $bus_leader_1_no['phone_number'] ?? '';
+            $user['bus_leader_2_no'] = $bus_leader_2_no['phone_number'] ?? '';
+            $api = $this->user_model->get_qr($data);
+            $user['qr_code'] = $api['api'];
             $response['user'] = $user ?? '';
             
             $this->session->set_userdata('user_id', $data['shibir_id']);
             $response['user']['permission'] = $this->admin_panel_model->get_permission($data['shibir_id']);
-            
+                if(($user['bus_leader_1'] == $user['name']) || ($user['bus_leader_2'] == $user['name']))
+                {
+                    $response['user']['permission']['view_bus_details'] = 'yes'; 
+                }
+                else{
+                    $response['user']['permission']['view_bus_details'] = 'no'; 
+                }
+                $resgitrar = $this->user_model->check_registrar($data);
+                if($resgitrar == true)
+                {
+                    $response['user']['permission']['edit_mandal_attendance'] = 'yes'; 
+                }
+                else{
+                    $response['user']['permission']['edit_mandal_attendance'] = 'no'; 
+                }
         
             $response['message'] = 'Login successful';
         }

@@ -49,6 +49,7 @@ class User extends CI_Controller {
               
                 parent::__construct();
                 $this->load->model('user_model');
+                $this->load->model('admin_panel_model');
         }
 
         public function get_all_user(){                
@@ -60,21 +61,56 @@ class User extends CI_Controller {
 
        public function get_by_id(){
             $postData = file_get_contents("php://input");
-            $id['shibir_id'] = json_decode($postData, true);
+            $data = json_decode($postData, true);
             $response = array();
-        
-            if(isset($id) && !empty($id)){
+            if(isset($data) && !empty($data)){
                 
-                $user = $this->user_model->get_by_id($id['shibir_id']);
-                $name = $this->user_model->get_yuvak_name($id['shibir_id']);
-                // var_dump($user);die;
-                $response['status'] = 'true';
-                $bus_leader['shibir_id'] = $user['bus_leader'] ?? '';
-                $bus_leader = $this->user_model->get_yuvak_name($bus_leader);
-                // var_dump($bus_leader);die;
-                $user['name'] = $name['name'] ?? '';
-                $user['bus_leader'] = $bus_leader['name'] ?? '';
-                $response['user'] = $user;
+                $response['status'] = true;
+            // $response['data'] = array();
+            
+            $user = $this->user_model->get_by_id($data);
+            $name = $this->user_model->get_yuvak_name($data);
+            $firstname = $this->user_model->get_yuvak_first_name($data);
+            $last_name = $this->user_model->get_yuvak_last_name($data);
+            // var_dump($user['role']);die;
+            $response['status'] = 'true';
+            $shibir_id['shibir_id'] = $user['bus_leader_1'] ?? '';
+            $bus_leader_1 = $this->user_model->get_yuvak_name($shibir_id);
+            $bus_leader_1_no = $this->user_model->get_phone_number($shibir_id);
+            $shibir_id['shibir_id'] = $user['bus_leader_2'] ?? '';
+            $bus_leader_2 = $this->user_model->get_yuvak_name($shibir_id);
+            $bus_leader_2_no = $this->user_model->get_phone_number($shibir_id);
+            $role = $this->admin_panel_model->get_role($user['role']);
+            
+            $user['name'] = $name['name'] ?? '';
+            $user['role'] = $role['role'] ?? '';
+            $user['firstname'] = $firstname['firstname'] ?? '';
+            $user['lastname'] = $last_name['lastname'] ?? '';
+            $user['bus_leader_1'] = $bus_leader_1['name'] ?? '';
+            $user['bus_leader_2'] = $bus_leader_2['name'] ?? '';
+            $user['bus_leader_1_no'] = $bus_leader_1_no['phone_number'] ?? '';
+            $user['bus_leader_2_no'] = $bus_leader_2_no['phone_number'] ?? '';
+            $api = $this->user_model->get_qr($data);
+            $user['qr_code'] = $api['api'];
+            $response['user'] = $user ?? '';
+            
+            $this->session->set_userdata('user_id', $data['shibir_id']);
+            $response['user']['permission'] = $this->admin_panel_model->get_permission($data['shibir_id']);
+                if(($user['bus_leader_1'] == $user['name']) || ($user['bus_leader_2'] == $user['name']))
+                {
+                    $response['user']['permission']['view_bus_details'] = 'yes'; 
+                }
+                else{
+                    $response['user']['permission']['view_bus_details'] = 'no'; 
+                }
+                $resgitrar = $this->user_model->check_registrar($data);
+                if($resgitrar == true)
+                {
+                    $response['user']['permission']['edit_mandal_attendance'] = 'yes'; 
+                }
+                else{
+                    $response['user']['permission']['edit_mandal_attendance'] = 'no'; 
+                }
             }
             else{
                 $response['status'] = 'false';
